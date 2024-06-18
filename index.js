@@ -34,8 +34,6 @@ async function renderMovies() {
                      <p class="card-text"><strong>Rating:</strong> ${
                        movie.vote_average
                      }/10</p>
-
-                     <p class="card-text"><strong>Rating:</strong> ${movie.vote_average}/10</p>
                     <p class="card-text"><strong>Release Year:</strong> ${
                       movie.release_date ? movie.release_date.split("-")[0] : ""
                     }</p>
