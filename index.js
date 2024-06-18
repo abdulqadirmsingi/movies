@@ -31,13 +31,11 @@ async function renderMovies() {
                     <p class="card-text"><strong>Genres:</strong> ${await getGenres(
                       movie.genre_ids
                     )}</p>
-<<<<<<< HEAD
                      <p class="card-text"><strong>Rating:</strong> ${
                        movie.vote_average
                      }/10</p>
-=======
+
                      <p class="card-text"><strong>Rating:</strong> ${movie.vote_average}/10</p>
->>>>>>> cab23719d1b71c55fac157aec9e4055b425a73b3
                     <p class="card-text"><strong>Release Year:</strong> ${
                       movie.release_date ? movie.release_date.split("-")[0] : ""
                     }</p>
