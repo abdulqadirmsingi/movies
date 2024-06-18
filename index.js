@@ -1,15 +1,15 @@
-const apiKey = '836c16606c17c0ce2a8741c5b7c60486'; // Replace with your actual API key
+const apiKey = "836c16606c17c0ce2a8741c5b7c60486"; // Replace with your actual API key
 const apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`;
 
 async function getMovies() {
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        return data.results;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return [];
-    }
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
 }
 
 async function renderMovies() {
@@ -31,7 +31,13 @@ async function renderMovies() {
                     <p class="card-text"><strong>Genres:</strong> ${await getGenres(
                       movie.genre_ids
                     )}</p>
+<<<<<<< HEAD
+                     <p class="card-text"><strong>Rating:</strong> ${
+                       movie.vote_average
+                     }/10</p>
+=======
                      <p class="card-text"><strong>Rating:</strong> ${movie.vote_average}/10</p>
+>>>>>>> cab23719d1b71c55fac157aec9e4055b425a73b3
                     <p class="card-text"><strong>Release Year:</strong> ${
                       movie.release_date ? movie.release_date.split("-")[0] : ""
                     }</p>
@@ -51,19 +57,28 @@ async function renderMovies() {
   });
 }
 
-
 async function getGenres(genreIds) {
-    const genreResponse = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=en-US`);
-    const genreData = await genreResponse.json();
-    const genres = genreData.genres.filter(genre => genreIds.includes(genre.id));
-    return genres.map(genre => genre.name).join(', ');
+  const genreResponse = await fetch(
+    `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=en-US`
+  );
+  const genreData = await genreResponse.json();
+  const genres = genreData.genres.filter((genre) =>
+    genreIds.includes(genre.id)
+  );
+  return genres.map((genre) => genre.name).join(", ");
 }
 
 async function getTrailerLink(movieId) {
-    const trailerResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`);
-    const trailerData = await trailerResponse.json();
-    const trailers = trailerData.results.filter(trailer => trailer.type === 'Trailer');
-    return trailers.length > 0 ? `https://www.youtube.com/watch?v=${trailers[0].key}` : '';
+  const trailerResponse = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=en-US`
+  );
+  const trailerData = await trailerResponse.json();
+  const trailers = trailerData.results.filter(
+    (trailer) => trailer.type === "Trailer"
+  );
+  return trailers.length > 0
+    ? `https://www.youtube.com/watch?v=${trailers[0].key}`
+    : "";
 }
 
 renderMovies();
