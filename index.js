@@ -3,10 +3,15 @@ const apiUrlBase = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey
 const moviesContainer = document.getElementById("movies-container");
 const paginationContainer = document.querySelector(".pagination");
 
+let currentPage = 1;
+let totalPages = 1;
+const maxPages = 20; // Limit to 20 pages
+
 async function getMovies(pageNumber) {
   try {
     const response = await fetch(apiUrlBase + pageNumber);
     const data = await response.json();
+    totalPages = Math.min(data.total_pages, maxPages); // Limit total pages to maxPages
     return data.results;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -14,9 +19,9 @@ async function getMovies(pageNumber) {
   }
 }
 
-async function renderMovies(pageNumber) {
+async function renderMovies() {
   moviesContainer.innerHTML = ""; // Clear previous movies
-  const movies = await getMovies(pageNumber);
+  const movies = await getMovies(currentPage);
 
   movies.forEach(async (movie) => {
     const movieCard = document.createElement("div");
@@ -58,18 +63,17 @@ async function renderMovies(pageNumber) {
     moviesContainer.appendChild(movieCard);
   });
 
-  // Update pagination links based on total pages from API
-  const totalPages = movies.total_pages;
-  renderPaginationLinks(totalPages);
+  renderPaginationLinks(); // Render pagination links after fetching movies
 }
 
-async function renderPaginationLinks(totalPages) {
+async function renderPaginationLinks() {
   paginationContainer.innerHTML = ""; // Clear previous pagination links
 
   for (let i = 1; i <= totalPages; i++) {
+    if (i > maxPages) break; // Stop rendering pagination links after maxPages
     const pageLink = document.createElement("li");
     pageLink.classList.add("page-item");
-    if (i === 1) pageLink.classList.add("active");
+    if (i === currentPage) pageLink.classList.add("active");
 
     pageLink.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
     paginationContainer.appendChild(pageLink);
@@ -80,12 +84,15 @@ async function renderPaginationLinks(totalPages) {
     if (event.target.tagName === "A") {
       event.preventDefault(); // Prevent default link behavior
       const pageNumber = parseInt(event.target.dataset.page); // Get the page number from data attribute
-      await renderMovies(pageNumber); // Render movies for the selected page
-      // Update active class for pagination links
-      document
-        .querySelectorAll(".page-item")
-        .forEach((item) => item.classList.remove("active"));
-      event.target.parentNode.classList.add("active");
+      if (pageNumber !== currentPage && pageNumber <= totalPages) {
+        currentPage = pageNumber;
+        await renderMovies(); // Render movies for the selected page
+        // Update active class for pagination links
+        document
+          .querySelectorAll(".page-item")
+          .forEach((item) => item.classList.remove("active"));
+        event.target.parentNode.classList.add("active");
+      }
     }
   });
 }
@@ -114,5 +121,5 @@ async function getTrailerLink(movieId) {
     : "";
 }
 
-
-renderMovies(1);
+// Initial render of movies and pagination links
+renderMovies();
