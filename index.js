@@ -5,7 +5,7 @@ const paginationContainer = document.querySelector(".pagination");
 
 let currentPage = 1;
 let totalPages = 1;
-const maxPages = 20; // Limit to 20 pages
+const maxPages = 15; 
 
 async function getMovies(pageNumber) {
   try {
