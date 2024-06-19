@@ -1,9 +1,11 @@
 const apiKey = "836c16606c17c0ce2a8741c5b7c60486"; // Replace with your actual API key
-const apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`;
+const apiUrlBase = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=`;
+const moviesContainer = document.getElementById("movies-container");
+const paginationContainer = document.querySelector(".pagination");
 
-async function getMovies() {
+async function getMovies(pageNumber) {
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrlBase + pageNumber);
     const data = await response.json();
     return data.results;
   } catch (error) {
@@ -12,9 +14,9 @@ async function getMovies() {
   }
 }
 
-async function renderMovies() {
-  const moviesContainer = document.getElementById("movies-container");
-  const movies = await getMovies();
+async function renderMovies(pageNumber) {
+  moviesContainer.innerHTML = ""; // Clear previous movies
+  const movies = await getMovies(pageNumber);
 
   movies.forEach(async (movie) => {
     const movieCard = document.createElement("div");
@@ -31,9 +33,13 @@ async function renderMovies() {
                     <p class="card-text"><strong>Genres:</strong> ${await getGenres(
                       movie.genre_ids
                     )}</p>
+
                      <p class="card-text"><strong>Rating:</strong> ${
                        movie.vote_average
                      }/10</p>
+
+                    
+
                     <p class="card-text"><strong>Release Year:</strong> ${
                       movie.release_date ? movie.release_date.split("-")[0] : ""
                     }</p>
@@ -50,6 +56,37 @@ async function renderMovies() {
         `;
 
     moviesContainer.appendChild(movieCard);
+  });
+
+  // Update pagination links based on total pages from API
+  const totalPages = movies.total_pages;
+  renderPaginationLinks(totalPages);
+}
+
+async function renderPaginationLinks(totalPages) {
+  paginationContainer.innerHTML = ""; // Clear previous pagination links
+
+  for (let i = 1; i <= totalPages; i++) {
+    const pageLink = document.createElement("li");
+    pageLink.classList.add("page-item");
+    if (i === 1) pageLink.classList.add("active");
+
+    pageLink.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+    paginationContainer.appendChild(pageLink);
+  }
+
+  // Add event listener to pagination links
+  paginationContainer.addEventListener("click", async (event) => {
+    if (event.target.tagName === "A") {
+      event.preventDefault(); // Prevent default link behavior
+      const pageNumber = parseInt(event.target.dataset.page); // Get the page number from data attribute
+      await renderMovies(pageNumber); // Render movies for the selected page
+      // Update active class for pagination links
+      document
+        .querySelectorAll(".page-item")
+        .forEach((item) => item.classList.remove("active"));
+      event.target.parentNode.classList.add("active");
+    }
   });
 }
 
@@ -77,4 +114,5 @@ async function getTrailerLink(movieId) {
     : "";
 }
 
-renderMovies();
+
+renderMovies(1);
